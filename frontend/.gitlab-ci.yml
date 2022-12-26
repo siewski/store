@@ -1,0 +1,95 @@
+variables:
+  VERSION: 1.0.${CI_PIPELINE_ID}
+  HELM_CHART_VERSION: 0.1.92122
+  SAST_EXCLUDED_ANALYZERS: "spotbugs,gosec"
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - project: 'templates/ci'
+    file: 'DockerInDockerTemplate.yml'
+
+stages:
+  - build
+  - test
+  - sonar
+  - release
+  - deploy
+
+build:
+  stage: build
+  script:
+    - cd frontend
+    - npm install
+    - npm run build
+    - cd ..
+    - mkdir dumplings-store-${VERSION}
+    - mv frontend/dist momo-store-${VERSION}
+  artifacts:
+    paths:
+      - momo-store-${VERSION}
+
+docker-build-frontend:
+  stage: build
+  image: docker:20.10.12-dind-rootless
+  before_script:
+    - until docker info; do sleep 1; done
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - cd frontend
+    - >
+      docker build
+      --build-arg VERSION=$VERSION
+      --tag $CI_REGISTRY_IMAGE/momo-store-frontend:$CI_COMMIT_SHA
+      .
+    - docker push $CI_REGISTRY_IMAGE/momo-store-frontend:$CI_COMMIT_SHA
+
+sonar-scan-frontend:
+  stage: test
+  image:
+    name: sonarsource/sonar-scanner-cli:4.4
+    entrypoint: [""]
+  variables:
+    SONAR_TOKEN: "${SONARQUBE_TOKEN}"
+    SONAR_HOST_URL: "${SONARQUBE_URL}"
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - cd frontend
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=07_MOSIEVSKIKH_MOMO_STORE_FRONTEND -Dsonar.projectName=07_MOSIEVSKIKH_MOMO_STORE_FRONTEND
+  allow_failure: true
+
+release:
+  stage: release
+  script:
+    - tar czvf momo-store-${VERSION}.tar.gz momo-store-${VERSION}
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file momo-store-${VERSION}.tar.gz ${NEXUS_REPO_URL}/repository/	momo-store-mosievskikh-frontend/${VERSION}/momo-store-${VERSION}.tar.gz
+
+docker-upload-frontend-latest:
+  variables:
+    GIT_STRATEGY: none
+  image: docker:20.10.12-dind-rootless
+  stage: release
+  before_script:
+    - until docker info; do sleep 1; done
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE/momo-store-frontend:$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE/momo-store-frontend:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE/dumplings-store-frontend:${VERSION}-$CI_COMMIT_BRANCH
+    - docker push $CI_REGISTRY_IMAGE/momo-store-frontend:${VERSION}-$CI_COMMIT_BRANCH
+
+
+deploy:
+  stage: deploy
+  image: alpine/k8s:1.22.6
+  when: manual
+  script:
+    - curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+    - /root/yandex-cloud/bin/yc config set token ${YC_TOKEN}
+    - /root/yandex-cloud/bin/yc managed-kubernetes cluster get-credentials --id cat7fchd6l3o8l81cr10 --external --folder-id b1g51tbhhb88qrbd3qj7
+    - helm repo add dumplings-store-helm-dmitriy-vereshchagin-02 https://nexus.praktikum-services.ru/repository/momo-store-helm-a-mosievskih-07/ --username ${NEXUS_REPO_USER} --password ${NEXUS_REPO_PASS}
+    - helm get values dumplings-store -a -n production > existing_values.yaml
+    - helm upgrade --install dumplings-store momo-store-helm-a-mosievskih-07/dumplings-store -n production --version ${HELM_CHART_VERSION} -f existing_values.yaml --set=frontend.image.tag=${VERSION}-$CI_COMMIT_BRANCH
