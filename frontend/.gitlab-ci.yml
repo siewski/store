@@ -22,7 +22,7 @@ build:
     - npm install
     - npm run build
     - cd ..
-    - mkdir dumplings-store-${VERSION}
+    - mkdir momo-store-${VERSION}
     - mv frontend/dist momo-store-${VERSION}
   artifacts:
     paths:
