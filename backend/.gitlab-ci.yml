@@ -1,4 +1,3 @@
-
 variables:
   VERSION: 1.0.${CI_PIPELINE_ID}
   HELM_CHART_VERSION: 0.1.92122
@@ -102,5 +101,5 @@ deploy:
     - /root/yandex-cloud/bin/yc config set token ${YC_TOKEN}
     - /root/yandex-cloud/bin/yc managed-kubernetes cluster get-credentials --id cat7fchd6l3o8l81cr10 --external --folder-id b1g51tbhhb88qrbd3qj7
     - helm repo add 	momo-store-helm-a-mosievskih-07 https://nexus.praktikum-services.ru/repository/momo-store-helm-a-mosievskih-07/ --username ${NEXUS_REPO_USER} --password ${NEXUS_REPO_PASS}
-    - helm get values dumplings-store -a -n production > existing_values.yaml
-    - helm upgrade --install dumplings-store momo-store-helm-a-mosievskih-07/dumplings-store -n production --version ${HELM_CHART_VERSION} -f existing_values.yaml --set=backend.image.tag=${VERSION}-$CI_COMMIT_BRANCH
+    - helm get values momo-store -a -n production > existing_values.yaml
+    - helm upgrade --install momo-store momo-store-helm-a-mosievskih-07/momo-store -n production --version ${HELM_CHART_VERSION} -f existing_values.yaml --set=backend.image.tag=${VERSION}-$CI_COMMIT_BRANCH
