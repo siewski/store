@@ -1,0 +1,13 @@
+global:
+
+  dockerconfigjson: xxx
+
+  backend:
+    ImageUrl: gitlab.praktikum-services.ru:5050/a.mosievskih/momo-store/backend
+    AppVersion: latest
+
+  frontend:
+    fqdn: "momosiewski.ru"
+    ImageUrl: gitlab.praktikum-services.ru:5050/a.mosievskih/momo-store/frontend
+    AppVersion: latest
+
