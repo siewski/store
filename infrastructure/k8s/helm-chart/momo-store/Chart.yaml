@@ -1,22 +1,19 @@
 ---
+---
 apiVersion: v2
-appVersion: latest
-dependencies:
-- condition: secret.enabled
-  name: secret
-  repository: ""
-  version: 0.1.0
-- condition: backend.enabled
-  name: backend
-  repository: ""
-  version: 0.1.0
-- condition: frontend.enabled
-  name: frontend
-  repository: ""
-  version: 0.1.0
-description: Momo Store Helm Chart
-home: https://gitlab.praktikum-services.ru/a.mosievskih/momo-store.git
-name: momo-store
 type: application
-version: 1.0.9
+name: pelmennaya2
+description: Pelmennaya Helm Chart
+
+appVersion: "latest"
+
+dependencies:
+  - name: backend
+    version: "~1.0.0"
+  - name: frontend
+    version: "~1.0.1"
+  - name: secret
+    version: "~1.0.1"
+
+version: 1.1.0
 
