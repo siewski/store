@@ -13,7 +13,7 @@ build:
     - |
       sed -i "s/0\.1\.2/$VERSION/g" infrastructure/k8s/helm-chart/momo-store/Chart.yaml
       helm package ./infrastructure/k8s/helm-chart/momo-store
-      curl -v -u ${NEXUS_REPO_USER}:${NEXUS_REPO_PASS} --upload-file momo-store-1.0.2.tgz https://nexus.praktikum-services.ru/repository/dmomo-store-helm-a-mosievskih-07/momo-store-1.0.2.tgz 
+      curl -v -u ${NEXUS_REPO_USER}:${NEXUS_REPO_PASS} --upload-file momo-store-1.0.2.tgz https://nexus.praktikum-services.ru/repository/momo-store-helm-a-mosievskih-07/momo-store-1.0.2.tgz
 
 
 deploy:
