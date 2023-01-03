@@ -21,8 +21,7 @@ sonarqube-backend-check:
     GIT_DEPTH: "0"
   script:
     - cd ${CI_PROJECT_DIR}/backend
-    - sonar-scanner -Dsonar.sources=.
-      -Dsonar.projectKey=07_MOSIEVSKIKH_MOMO_STORE_BACKEND ${scanner_opt}
+    - sonar-scanner -Dsonar.sources=. -Dsonar.projectKey=07_MOSIEVSKIKH_MOMO_STORE_BACKEND ${scanner_opt}
   allow_failure: true
 build-code-job:
   image: golang:1.17
@@ -32,9 +31,7 @@ build-code-job:
     - go build ./cmd/api/
     - chmod +x api
     - mv api ../api-${VERSION}
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file
-      ../api-${VERSION}
-      ${NEXUS_REPO_URL}/momo-store-mosievskikh-backend/${VERSION}/api-${VERSION}
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file ../api-${VERSION} ${NEXUS_REPO_URL}/momo-store-mosievskikh-backend/${VERSION}/api-${VERSION}
   artifacts:
     paths:
       - api-${VERSION}
@@ -48,8 +45,10 @@ build-docker-backend:
     - cp api-${VERSION} backend/
     - cd backend
     - >
-      docker build --build-arg VERSION=$VERSION --tag
-      $CI_REGISTRY_IMAGE/backend:$VERSION .
+      docker build 
+      --build-arg VERSION=$VERSION 
+      --tag $CI_REGISTRY_IMAGE/backend:$VERSION 
+      .
     - docker push $CI_REGISTRY_IMAGE/backend:$VERSION
 upload-backend-latest:
   variables:
