@@ -4,8 +4,7 @@ stages:
 helm-job:
   stage: helm-job
   script:
-    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 |
-      bash
+    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
     - cd infrastructure/k8s/helm-chart
     - helm package --dependency-update momo-store/
     - >
