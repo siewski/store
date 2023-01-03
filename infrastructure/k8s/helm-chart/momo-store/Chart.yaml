@@ -12,5 +12,5 @@ dependencies:
   - name: frontend
     version: "~1.0.1"
 
-version: 1.0.10
+version: 1.0.11
 
