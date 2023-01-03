@@ -1,44 +1,41 @@
+---
 stages:
   - module-pipelines
   - deploy
-
 frontend:
   stage: module-pipelines
   trigger:
     include:
-      - "/frontend/.gitlab-ci.yml"
-    strategy: depend #depend нужен, если какой-нибудь дочерний пайплайн свалился, мы знали, что общий пайплайн тоже идёт с ошибкой
+      - /frontend/.gitlab-ci.yml
+    strategy: depend
   only:
     refs:
       - testing
-    changes: #как только происходит изменение в папке frontend, запускается дочерний пайплайн, который лежит в этой папке
+    changes:
       - frontend/**/*
-
 backend:
   stage: module-pipelines
   trigger:
     include:
-      - "/backend/.gitlab-ci.yml"
-    strategy: depend 
+      - /backend/.gitlab-ci.yml
+    strategy: depend
   only:
     refs:
       - testing
-    changes:  #как только происходит изменение в папке backend, запускается дочерний пайплайн, который лежит в этой папке
-      - backend/**/* 
-
+    changes:
+      - backend/**/*
 helm:
   stage: module-pipelines
   trigger:
     include:
-      - "/infrastructure/k8s/helm-chart/.gitlab-ci.yml"
-    strategy: depend 
+      - /infrastructure/k8s/helm-chart/.gitlab-ci.yml
+    strategy: depend
   only:
     refs:
       - testing
     changes:
       - infrastructure/k8s/helm-chart/momo-store/**/*
       - infrastructure/k8s/helm-chart/.gitlab-ci.yml
-
 deploy:
   stage: deploy
   environment:
@@ -53,14 +50,19 @@ deploy:
       - infrastructure/k8s/helm-chart/momo-store/**/*
   script:
     - >
-      export front_vers=$(grep -oP 'VERSION:.(\d+\.\d+\.\d+)' ./frontend/.gitlab-ci.yml | sed 's/VERSION:.//')
+      export front_vers=$(grep -oP 'VERSION:.(\d+\.\d+\.\d+)'
+      ./frontend/.gitlab-ci.yml | sed 's/VERSION:.//')
     - >
-      export backend_vers=$(grep -oP 'VERSION:.(\d+\.\d+\.\d+)' ./backend/.gitlab-ci.yml | sed 's/VERSION:.//')
+      export backend_vers=$(grep -oP 'VERSION:.(\d+\.\d+\.\d+)'
+      ./backend/.gitlab-ci.yml | sed 's/VERSION:.//')
     - mkdir ~/.kube/
     - ln -s  $kubeconfig ~/.kube/config
-    - curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl
+      -s
+      https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
     - chmod +x kubectl
-    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 |
+      bash
     - echo $front_vers   $backend_vers  $fqdn_site $dockerconfigjson
     - |
       helm upgrade --install momo-store \
