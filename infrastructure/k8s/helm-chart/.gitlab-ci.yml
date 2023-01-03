@@ -1,12 +1,25 @@
 ---
 stages:
-  - helm-job
-helm-job:
-  stage: helm-job
+  - build
+  - deploy
+
+build:
+  stage: build
+  image: alpine/k8s:1.22.6
   script:
-    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-    - cd infrastructure/k8s/helm-chart
-    - helm package --dependency-update momo-store/
-    - >
-      export VERSION=$(grep -oP 'version: \"(\d+\.\d+\.\d+)\"' momo-store/Chart.yaml | sed 's/version: //' | sed 's/\"//g') 
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file momo-store-${VERSION}.tgz ${NEXUS_REPO_URL}/momo-store-helm-a-mosievskih-07/momo-store-${VERSION}.tgz
+    - |
+      sed -i "s/0\.1\.2/$VERSION/g" /Chart.yaml
+      helm package ./momo-store-chart
+      curl -u ${NEXUS_REPO_USER}:${NEXUS_REPO_PASS} https://nexus.praktikum-services.ru/repository/momo-store-helm-a-mosievskih-07/ --upload-file momo-store-${VERSION}.tgz
+
+deploy:
+  stage: deploy
+  image: alpine/k8s:1.22.6
+  when: manual
+  script:
+    - curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+    - /root/yandex-cloud/bin/yc config set token ${YC_TOKEN}
+    - /root/yandex-cloud/bin/yc managed-kubernetes cluster get-credentials --id b1g7jn7va51ie1na46qt --external --folder-id b1gja3q0vkl04tb3cc71
+    - helm repo add momo-store-helm-a-mosievskih-07 https://nexus.praktikum-services.ru/repository/momo-store-helm-a-mosievskih-07/ --username ${NEXUS_REPO_USER} --password ${NEXUS_REPO_PASS}
+    - helm upgrade --install momo-store momo-store-helm-a-mosievskih-07/momo-store -n production --version 0.1.${CI_PIPELINE_ID}
+
