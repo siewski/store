@@ -3,8 +3,6 @@ variables:
   VERSION: 1.0.${CI_PIPELINE_ID}
   SAST_EXCLUDED_ANALYZERS: "eslint,gosec,nodejs-scan"
   
-image: golang:1.18
-
 include:
   - template: Security/SAST.gitlab-ci.yml
   - project: 'templates/ci'
@@ -31,11 +29,12 @@ sonarqube-backend-check:
 
 build-code-job:
   stage: build-code
+  image: golang
   script:
-    - cd backend
-    - mkdir -p bin
-    - go build -o bin ./...
-    - cd .. 
+    - cd backend 
+    - go build ./cmd/api/
+    - chmod +x api
+    - mv api ../api-${VERSION}
     # Загрузка артефакта
     - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file ../api-${VERSION} ${NEXUS_REPO_URL}/momo-store-mosievskikh-backend/${VERSION}/api-${VERSION}
   artifacts:
