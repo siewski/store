@@ -6,7 +6,7 @@ helm-job:
   script:
     - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 |
       bash
-    - cd infrastructure/kubernetes/helm-chart
+    - cd infrastructure/k8s/helm-chart
     - helm package --dependency-update momo-store/
     - >
       export VERSION=$(grep -oP 'version: \"(\d+\.\d+\.\d+)\"'
