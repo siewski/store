@@ -28,8 +28,8 @@ sonarqube-backend-check:
   allow_failure: true
 
 build-code-job:
+    image: golang:1.17
   stage: build-code
-  image: golang
   script:
     - cd backend 
     - go build ./cmd/api/
