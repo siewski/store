@@ -21,8 +21,7 @@ sonarqube-frontend-check:
     GIT_DEPTH: "0"
   script:
     - cd ${CI_PROJECT_DIR}/frontend/src
-    - sonar-scanner -Dsonar.sources=.
-      -Dsonar.projectKey=07_MOSIEVSKIKH_MOMO_STORE_FRONTEND ${scanner_opt}
+    - sonar-scanner -Dsonar.sources=. -Dsonar.projectKey=07_MOSIEVSKIKH_MOMO_STORE_FRONTEND ${scanner_opt}
   allow_failure: true
 build-code-job:
   stage: build
@@ -37,9 +36,7 @@ build-code-job:
     - mv frontend/dist/ frontend-${VERSION}/
     - tar -czvf frontend-${VERSION}.tar.gz frontend-${VERSION}
     - apk add curl
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file
-      frontend-${VERSION}.tar.gz
-      ${NEXUS_REPO_URL}/momo-store-mosievskikh-frontend/${VERSION}/frontend-${VERSION}.tar.gz
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file frontend-${VERSION}.tar.gz ${NEXUS_REPO_URL}/momo-store-mosievskikh-frontend/${VERSION}/frontend-${VERSION}.tar.gz
   artifacts:
     paths:
       - frontend-${VERSION}/
@@ -56,8 +53,9 @@ build-frontend-docker:
     - ls -la frontend/public_html
     - cd frontend
     - >
-      docker build --build-arg VERSION=$VERSION --tag
-      $CI_REGISTRY_IMAGE/frontend:$VERSION .
+      docker build 
+      --build-arg VERSION=$VERSION 
+      --tag $CI_REGISTRY_IMAGE/frontend:$VERSION .
     - docker push $CI_REGISTRY_IMAGE/frontend:$VERSION
 upload-frontend-latest:
   variables:
@@ -69,6 +67,5 @@ upload-frontend-latest:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker pull $CI_REGISTRY_IMAGE/frontend:$VERSION
-    - docker tag $CI_REGISTRY_IMAGE/frontend:$VERSION
-      $CI_REGISTRY_IMAGE/frontend:latest
+    - docker tag $CI_REGISTRY_IMAGE/frontend:$VERSION $CI_REGISTRY_IMAGE/frontend:latest
     - docker push $CI_REGISTRY_IMAGE/frontend:latest
