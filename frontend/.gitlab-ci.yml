@@ -43,7 +43,8 @@ build:
 release:
    stage: release
    script:
-    - cd frontend
+    - cd .. 
+    - mv frontend/dist/ frontend-${VERSION}/
     - tar czvf sausage-store-${VERSION}.tar.gz frontend
     - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file frontend-${VERSION}.tar.gz ${NEXUS_REPO_URL}/momo-store-mosievskikh-frontend/${VERSION}/frontend-${VERSION}.tar.gz
 
