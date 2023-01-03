@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - {{ .Values.global.frontend.fqdn }}
+      - {{ .Values.global.fqdn }}
       secretName: letsencrypt
   rules:
-    - host: {{ .Values.global.frontend.fqdn }}
+    - host: {{ .Values.global.fqdn }}
       http:
         # Для различных путей в URL можно указать различные бэкенд-сервисы
         paths:
