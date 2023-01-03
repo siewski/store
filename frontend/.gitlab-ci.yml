@@ -1,9 +1,3 @@
-stages:
-  - test
-  - build
-  - build-docker-front
-  - release
-
 variables:
   VERSION: 1.0.21
 
@@ -11,6 +5,12 @@ include:
   - template: Security/SAST.gitlab-ci.yml
   - project: 'templates/ci'
     file: 'DockerInDockerTemplate.yml'
+
+stages:
+  - test
+  - build
+  - build-docker-front
+  - release
 
 sonarqube-frontend-check:
   stage: test
