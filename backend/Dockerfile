@@ -1,11 +1,12 @@
-FROM golang:1.18-buster AS build
+FROM golang:1.18
+ARG VERSION=${VERSION}
 WORKDIR /app
-COPY . .
-RUN mkdir -p bin && go build -o bin ./...
-
-FROM gcr.io/distroless/base-debian10
-WORKDIR /
-COPY --from=build /app/bin/api /api
-EXPOSE 8081
-USER nonroot:nonroot
-ENTRYPOINT ["/api"]
+RUN addgroup --system jaruser \
+    && adduser --system --shell /bin/false --disabled-login --ingroup jaruser jaruser \
+    && apt update && apt install -y dumb-init curl && apt clean
+COPY --chown=jaruser:jaruser \
+     ./api-${VERSION} ./api
+EXPOSE 8080
+# приложение будет запускаться под пользователем jaruser
+USER jaruser
+ENTRYPOINT ["dumb-init", "./api"]
