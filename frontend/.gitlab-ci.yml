@@ -58,8 +58,8 @@ build-frontend-docker:
     - >
       docker build 
       --build-arg VERSION=$VERSION 
-      --tag $CI_REGISTRY_IMAGE/frontend:$VERSION .
-    - docker push $CI_REGISTRY_IMAGE/frontend:$VERSION
+      --tag $CI_REGISTRY_IMAGE/momo-frontend:$VERSION .
+    - docker push $CI_REGISTRY_IMAGE/momo-frontend:$VERSION
 upload-frontend-latest:
   variables:
     GIT_STRATEGY: none
@@ -69,6 +69,6 @@ upload-frontend-latest:
     - until docker info; do sleep 1; done
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker pull $CI_REGISTRY_IMAGE/frontend:$VERSION
-    - docker tag $CI_REGISTRY_IMAGE/frontend:$VERSION $CI_REGISTRY_IMAGE/frontend:latest
-    - docker push $CI_REGISTRY_IMAGE/frontend:latest
+    - docker pull $CI_REGISTRY_IMAGE/momo-frontend:$VERSION
+    - docker tag $CI_REGISTRY_IMAGE/momo-frontend:$VERSION $CI_REGISTRY_IMAGE/momo-frontend:latest
+    - docker push $CI_REGISTRY_IMAGE/momo-frontend:latest
