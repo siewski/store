@@ -49,16 +49,12 @@ deploy:
       - infrastructure/k8s/helm-chart/momo-store/**/*
   script:
     - >
-      export front_vers=$(grep -oP 'VERSION:.(\d+\.\d+\.\d+)'
-      ./frontend/.gitlab-ci.yml | sed 's/VERSION:.//')
+      export front_vers=$(grep -oP 'VERSION:.(\d+\.\d+\.\d+)' ./frontend/.gitlab-ci.yml | sed 's/VERSION:.//')
     - >
-      export backend_vers=$(grep -oP 'VERSION:.(\d+\.\d+\.\d+)'
-      ./backend/.gitlab-ci.yml | sed 's/VERSION:.//')
+      export backend_vers=$(grep -oP 'VERSION:.(\d+\.\d+\.\d+)' ./backend/.gitlab-ci.yml | sed 's/VERSION:.//')
     - mkdir ~/.kube/
     - ln -s  $kubeconfig ~/.kube/config
-    - curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl
-      -s
-      https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
     - chmod +x kubectl
     - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 |
       bash
