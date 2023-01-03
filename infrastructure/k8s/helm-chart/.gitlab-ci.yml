@@ -1,17 +1,19 @@
 ---
+variables:
+  VERSION: 0.1.${CI_PIPELINE_ID}
+
 stages:
-  - helm-job
+  - build
   - deploy
 
-helm-job:
-  stage: helm-job
+build:
+  stage: build
+  image: alpine/k8s:1.22.6
   script:
-    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-    - cd infrastructure/k8s/helm-chart/
-    - helm package --dependency-update momo-store/
-    - >
-      export VERSION=1.0.${CI_PIPELINE_ID}
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file momo-store-${VERSION}.tgz ${NEXUS_REPO_URL}/momo-store-helm-a-mosievskih-07/momo-store-${VERSION}.tgz
+    - |
+      sed -i "s/0\.1\.2/$VERSION/g" infrastructure/k8s/helm-chart/Chart.yaml
+      helm package --dependency-update momo-store/
+      curl -u ${NEXUS_REPO_USER}:${NEXUS_REPO_PASS} https://nexus.praktikum-services.ru/repository/dmomo-store-helm-a-mosievskih-07/ --upload-file momo-store-${VERSION}.tgz
 
 
 deploy:
