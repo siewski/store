@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  replicas: 2
+  revisionHistoryLimit: 15
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 20%
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.global.backend.ImageUrl }}:{{ .Values.global.backend.AppVersion }}
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}-config
+          ports:
+            - name: {{ .Chart.Name }}
+              containerPort: 8081
+          resources:
+            requests:
+              memory: "312Mi"
+              cpu: "200m"
+            limits:
+              memory: "600Mi"
+              cpu: "600m"
+      imagePullSecrets:
+        - name: docker-config-secret
