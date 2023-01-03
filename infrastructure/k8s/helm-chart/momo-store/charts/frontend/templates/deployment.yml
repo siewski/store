@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 15
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  strategy:
+    type: RollingUpdate
+    #type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image:  {{ .Values.global.frontend.ImageUrl }}:{{ .Values.global.frontend.AppVersion }}
+          imagePullPolicy: Always
+          ports:
+            - name: {{ .Chart.Name }}
+              containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 25
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 6
+          resources:
+            requests:
+              memory: "180Mi"
+              cpu: "100m"
+            limits:
+              memory: "400Mi"
+              cpu: "400m"
+      imagePullSecrets:
+        - name: docker-config-secret
