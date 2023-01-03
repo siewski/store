@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image:  {{ .Values.global.frontend.ImageUrl }}:{{ .Values.global.frontend.AppVersion }}
+          image: {{ .Values.global.frontend_reg }}
           imagePullPolicy: Always
           ports:
             - name: {{ .Chart.Name }}
