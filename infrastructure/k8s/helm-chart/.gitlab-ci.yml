@@ -5,7 +5,6 @@ stages:
 
 helm-job:
   stage: helm-job
-  image: alpine/k8s:1.25.5
   script:
     - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
     - cd infrastructure/k8s/helm-chart/
