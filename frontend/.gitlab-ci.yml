@@ -12,8 +12,10 @@ include:
 stages:
   - test
   - build
-  - build-docker-front
   - release
+  - build-docker-front
+  - upload
+
 sonarqube-frontend-check:
   stage: test
   image:
@@ -27,21 +29,28 @@ sonarqube-frontend-check:
     - cd ${CI_PROJECT_DIR}/frontend/src
     - sonar-scanner -Dsonar.sources=. -Dsonar.projectKey=07_MOSIEVSKIKH_MOMO_STORE_FRONTEND ${scanner_opt}
   allow_failure: true
-build-code-job:
-  stage: build
-  image: node:lts-alpine
-  script:
-    - cd frontend
-    - npm install
-    - npm run build
-    - cd ..
-    - mv frontend/dist/ frontend-${VERSION}/
-    - tar -czvf frontend-${VERSION}.tar.gz frontend-${VERSION}
-    - apk add curl
+
+build:
+   stage: build
+   script:
+     - cd frontend
+     - npm install
+     - npm run build
+   only:
+     changes:
+     - frontend/*
+
+release:
+   stage: release
+   script:
+    - cd frontend/dist
+    - tar czvf sausage-store-${VERSION}.tar.gz frontend
     - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file frontend-${VERSION}.tar.gz ${NEXUS_REPO_URL}/momo-store-mosievskikh-frontend/${VERSION}/frontend-${VERSION}.tar.gz
-  artifacts:
-    paths:
-      - frontend-${VERSION}/
+
+   only:
+     changes:
+     - frontend/*
+
 build-frontend-docker:
   stage: build-docker-front
   image: docker:20.10.12-dind-rootless
@@ -61,7 +70,7 @@ upload-frontend-latest:
   variables:
     GIT_STRATEGY: none
   image: docker:20.10.12-dind-rootless
-  stage: release
+  stage: upload
   before_script:
     - until docker info; do sleep 1; done
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
