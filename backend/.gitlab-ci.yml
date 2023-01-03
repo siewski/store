@@ -54,7 +54,7 @@ build-docker-backend:
       --build-arg VERSION=$VERSION
       --tag $CI_REGISTRY_IMAGE/backend:$VERSION
       .
-- docker push $CI_REGISTRY_IMAGE/backend:$VERSION
+      - docker push $CI_REGISTRY_IMAGE/backend:$VERSION
 
 upload-backend-latest:
   variables:
