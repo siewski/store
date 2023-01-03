@@ -1,61 +1,56 @@
+---
 include:
   - template: Security/SAST.gitlab-ci.yml
-  - project: 'templates/ci'
-    file: 'DockerInDockerTemplate.yml'
-
+  - project: templates/ci
+    file: DockerInDockerTemplate.yml
 variables:
   VERSION: 1.0.5
-
 stages:
   - test
   - build-code
   - build-docker
   - release
-
 sonarqube-backend-check:
   stage: test
   image:
     name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
+    entrypoint:
+      - ""
   variables:
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+    SONAR_USER_HOME: ${CI_PROJECT_DIR}/.sonar
+    GIT_DEPTH: "0"
   script:
     - cd ${CI_PROJECT_DIR}/backend
-    - sonar-scanner -Dsonar.sources=. -Dsonar.projectKey=07_MOSIEVSKIKH_MOMO_STORE_BACKEND ${scanner_opt}
+    - sonar-scanner -Dsonar.sources=.
+      -Dsonar.projectKey=07_MOSIEVSKIKH_MOMO_STORE_BACKEND ${scanner_opt}
   allow_failure: true
-
 build-code-job:
   image: golang:1.17
   stage: build-code
   script:
-    - cd backend 
+    - cd backend
     - go build ./cmd/api/
     - chmod +x api
     - mv api ../api-${VERSION}
-    # Загрузка артефакта
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file ../api-${VERSION} ${NEXUS_REPO_URL}/momo-store-mosievskikh-backend/${VERSION}/api-${VERSION}
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file
+      ../api-${VERSION}
+      ${NEXUS_REPO_URL}/momo-store-mosievskikh-backend/${VERSION}/api-${VERSION}
   artifacts:
     paths:
-      - api-${VERSION} # сохранение собранного бэкенда как артефакт
-
+      - api-${VERSION}
 build-docker-backend:
   stage: build-docker
   image: docker:20.10.12-dind-rootless
   before_script:
     - until docker info; do sleep 1; done
-    # переменные CI_REGISTRY_USER, CI_REGISTRY_PASSWORD, CI_REGISTRY генерятся Гитлабом, их задавать не надо
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - cp api-${VERSION} backend/
     - cd backend
     - >
-      docker build
-      --build-arg VERSION=$VERSION
-      --tag $CI_REGISTRY_IMAGE/backend:$VERSION
-      .
+      docker build --build-arg VERSION=$VERSION --tag
+      $CI_REGISTRY_IMAGE/backend:$VERSION .
     - docker push $CI_REGISTRY_IMAGE/backend:$VERSION
-
 upload-backend-latest:
   variables:
     GIT_STRATEGY: none
@@ -66,6 +61,6 @@ upload-backend-latest:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker pull $CI_REGISTRY_IMAGE/backend:$VERSION
-    # если образ прошел проверки в CI (сканирование, тесты и т.д), то тегаем latest
-    - docker tag $CI_REGISTRY_IMAGE/backend:$VERSION $CI_REGISTRY_IMAGE/backend:latest
+    - docker tag $CI_REGISTRY_IMAGE/backend:$VERSION
+      $CI_REGISTRY_IMAGE/backend:latest
     - docker push $CI_REGISTRY_IMAGE/backend:latest
