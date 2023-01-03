@@ -7,7 +7,7 @@ global:
     AppVersion: latest
 
   frontend:
-    fqdn: "momo.siewski.ru"
+    fqdn: "siewski.ru"
     ImageUrl: gitlab.praktikum-services.ru:5050/a.mosievskih/momo-store/frontend
     AppVersion: latest
 
