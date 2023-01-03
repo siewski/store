@@ -7,10 +7,14 @@ build:
   stage: build
   image: alpine/k8s:1.22.6
   script:
-    - |
-      sed -i "s/0\.1\.2/$VERSION/g" infrastructure/k8s/helm-chart/momo-store/Chart.yaml
-      helm package ./infrastructure/k8s/helm-chart/momo-store/
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file momo-store-${VERSION}.tgz ${NEXUS_REPO_URL}/momo-store-helm-a-mosievskih-07/momo-store-${VERSION}.tgz 
+    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    - cd infrastructure/k8s/helm-chart/momo-store
+    - helm package --dependency-update momo-store/
+    - >
+      export VERSION=$(grep -oP 'version: \"(\d+\.\d+\.\d+)\"' momo-store/Chart.yaml | sed 's/version: //' | sed 's/\"//g')
+- curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file momo-store-${VERSION}.tgz ${NEXUS_REPO_URL}/momo-store-helm-a-mosievskih-07/momo-store-${VERSION}.tgz
+
+
 deploy:
   stage: deploy
   image: alpine/k8s:1.22.6
