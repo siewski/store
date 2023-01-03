@@ -12,8 +12,6 @@ dependencies:
     version: "~1.0.0"
   - name: frontend
     version: "~1.0.1"
-  - name: secret
-    version: "~1.0.0"
 
 version: 1.0.10
 
