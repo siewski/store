@@ -42,8 +42,6 @@ build-code-job:
   artifacts:
     paths:
       - frontend-${VERSION}/
-    reports:
-      dotenv: CI_JOB_ID.txt
 build-frontend-docker:
   stage: build-docker-front
   image: docker:20.10.12-dind-rootless
