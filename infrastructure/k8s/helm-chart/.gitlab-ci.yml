@@ -14,7 +14,7 @@ helm-job:
     - helm package --dependency-update momo-store/
     - >
       export VERSION=$(grep -oP 'version: \"(\d+\.\d+\.\d+)\"' momo-store/Chart.yaml | sed 's/version: //' | sed 's/\"//g')
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file momo-store-${VERSION}.tgz ${NEXUS_REPO_URL}/momo-store-helm-a-mosievskih-07/momo-store-${VERSION}.tgz
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file momo-store-0.1.${CI_PIPELINE_ID}.tgz ${NEXUS_REPO_URL}/momo-store-helm-a-mosievskih-07/momo-store-0.1.${CI_PIPELINE_ID}.tgz
 
 
 deploy:
