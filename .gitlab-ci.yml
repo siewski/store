@@ -1,5 +1,6 @@
 stages:
   - module-pipelines
+  - deploy
 
 frontend:
   stage: module-pipelines
@@ -8,6 +9,8 @@ frontend:
       - "/frontend/.gitlab-ci.yml"
     strategy: depend
   only:
+    refs:
+      - testing
     changes:
       - frontend/**/*
 
@@ -18,24 +21,57 @@ backend:
       - "/backend/.gitlab-ci.yml"
     strategy: depend
   only:
+    refs:
+      - testing
     changes:
       - backend/**/*
-
-backend-report:
-  stage: module-pipelines
-  trigger:
-    include:
-      - "/backend-report/.gitlab-ci.yml"
-    strategy: depend 
-  only:
-    changes:
-      - backend-report/**/*
 
 helm-chart:
   stage: module-pipelines
   trigger:
     include:
-      - "helm-chart.gitlab-ci.yml"
+      - /infrastructure/k8s/helm-chart/.gitlab-ci.yml
+    strategy: depend
   only:
+    refs:
+      - testing
     changes:
-      - sausage-store-chart/**/*
+      - infrastructure/k8s/helm-chart/momo-store/**/*
+      - infrastructure/k8s/helm-chart/.gitlab-ci.yml
+
+deploy:
+  stage: deploy
+  environment:
+    name: $CI_COMMIT_REF_NAME
+  only:
+    refs:
+      - production
+      - testing
+    changes:
+      - backend/**/*
+      - frontend/**/*
+      - infrastructure/k8s/helm-chart/momo-store/**/*
+  script:
+    - >
+      export front_vers=$(grep -oP 'VERSION:.(\d+\.\d+\.\d+)'
+      ./frontend/.gitlab-ci.yml | sed 's/VERSION:.//')
+    - >
+      export backend_vers=$(grep -oP 'VERSION:.(\d+\.\d+\.\d+)'
+      ./backend/.gitlab-ci.yml | sed 's/VERSION:.//')
+    - mkdir ~/.kube/
+    - ln -s  $kubeconfig ~/.kube/config
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl
+      -s
+      https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+    - chmod +x kubectl
+    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 |
+      bash
+    - echo $front_vers   $backend_vers  $fqdn_site $dockerconfigjson
+    - |
+      helm upgrade --install momo-store \
+      --set global.dockerconfigjson=$dockerconfigjson \
+      --set global.frontend.AppVersion=$front_vers \
+      --set global.backend.AppVersion=$backend_vers \
+      --atomic \
+      --set global.frontend.fqdn=$fqdn_site \
+      ./infrastructure/kubernetes/helm-chart/momo-store/
