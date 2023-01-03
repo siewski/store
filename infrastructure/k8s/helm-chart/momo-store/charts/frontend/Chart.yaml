@@ -1,7 +1,7 @@
 ---
 apiVersion: v2
 type: application
-name: backend
-description: Backend pelmen Helm Chart
+name: frontend
+description: Frontend momo-store Helm Chart
 
-version: "1.0.0"
+version: "1.0.1"
