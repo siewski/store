@@ -12,7 +12,7 @@ build:
   script:
     - |
       sed -i "s/0\.1\.2/$VERSION/g" infrastructure/k8s/helm-chart/momo-store/Chart.yaml
-      helm package --dependency-update momo-store/
+      helm package ./infrastructure/k8s/helm-chart/momo-store/
       curl -u ${NEXUS_REPO_USER}:${NEXUS_REPO_PASS} https://nexus.praktikum-services.ru/repository/dmomo-store-helm-a-mosievskih-07/ --upload-file momo-store-${VERSION}.tgz
 
 
