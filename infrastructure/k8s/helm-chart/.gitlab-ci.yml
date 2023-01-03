@@ -1,7 +1,4 @@
 ---
-variables:
-  VERSION: 0.1.${CI_PIPELINE_ID}
-
 stages:
   - build
   - deploy
@@ -13,7 +10,7 @@ build:
     - |
       sed -i "s/0\.1\.2/$VERSION/g" infrastructure/k8s/helm-chart/momo-store/Chart.yaml
       helm package ./infrastructure/k8s/helm-chart/momo-store
-      curl -v -u ${NEXUS_REPO_USER}:${NEXUS_REPO_PASS} --upload-file momo-store-1.0.6.tgz https://nexus.praktikum-services.ru/repository/momo-store-helm-a-mosievskih-07/momo-store-1.0.6.tgz
+      curl -v -u ${NEXUS_REPO_USER}:${NEXUS_REPO_PASS} --upload-file momo-store-1.0.7.tgz https://nexus.praktikum-services.ru/repository/momo-store-helm-a-mosievskih-07/momo-store-1.0.7.tgz
 
 
 deploy:
@@ -26,5 +23,5 @@ deploy:
     - /root/yandex-cloud/bin/yc config set token ${YC_TOKEN}
     - /root/yandex-cloud/bin/yc managed-kubernetes cluster get-credentials momo-cluster --external --folder-id b1gja3q0vkl04tb3cc71
     - helm repo add momo-store-helm-a-mosievskih-07 https://nexus.praktikum-services.ru/repository/momo-store-helm-a-mosievskih-07/ --username ${NEXUS_REPO_USER} --password ${NEXUS_REPO_PASS}
-    - helm upgrade --install momo-store momo-store-helm-a-mosievskih-07/momo-store -n default --version 1.0.6
+    - helm upgrade --install momo-store momo-store-helm-a-mosievskih-07/momo-store -n default --version 1.0.7
 
