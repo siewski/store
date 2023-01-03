@@ -7,6 +7,7 @@ helm-job:
   stage: helm-job
   image: alpine/k8s:1.22.6
   script:
+    - VERIFY_CHECKSUM=false
     - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
     - cd infrastructure/k8s/helm-chart/
     - helm package --dependency-update momo-store/
@@ -20,6 +21,7 @@ deploy:
   image: alpine/k8s:1.22.6
   when: manual
   script:
+    - VERIFY_CHECKSUM=false
     - curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
     - /root/yandex-cloud/bin/yc config set token ${YC_TOKEN}
     - /root/yandex-cloud/bin/yc managed-kubernetes cluster get-credentials --id catp8gd2dusp38ctafd6 --external --folder-id b1gja3q0vkl04tb3cc71
