@@ -18,5 +18,5 @@ description: Momo Store Helm Chart
 home: https://gitlab.praktikum-services.ru/a.mosievskih/momo-store.git
 name: momo-store
 type: application
-version: 0.1.7
+version: 1.0.7
 
