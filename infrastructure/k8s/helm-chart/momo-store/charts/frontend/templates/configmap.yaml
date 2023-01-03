@@ -1,9 +1,10 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: momo-store-configmap
+  name: dump-conf
 data:
-  sausage-store.conf: |
+  default.conf: |
     server {
 
       listen 80;
@@ -14,7 +15,15 @@ data:
         try_files $uri $uri/ /index.html;
       }
 
-      location /api {
-          proxy_pass http://backend:8081;
+      location /categories {
+      proxy_pass http://backend:8081;
+      }
+
+      location /products {
+      proxy_pass http://backend:8081;
+      }
+
+      location /auth {
+      proxy_pass http://backend:8081;
       }
     }
