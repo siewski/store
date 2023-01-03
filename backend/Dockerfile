@@ -6,7 +6,7 @@ RUN addgroup --system jaruser \
     && apt update && apt install -y dumb-init curl && apt clean
 COPY --chown=jaruser:jaruser \
      ./api-${VERSION} ./api
-EXPOSE 8080
+EXPOSE 8081
 # приложение будет запускаться под пользователем jaruser
 USER jaruser
 ENTRYPOINT ["dumb-init", "./api"]
