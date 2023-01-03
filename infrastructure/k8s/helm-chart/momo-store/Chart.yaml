@@ -1,9 +1,8 @@
 ---
----
 apiVersion: v2
 type: application
-name: pelmennaya2
-description: Pelmennaya Helm Chart
+name: momo-store
+description: Momo Store Helm Chart
 
 appVersion: "latest"
 
