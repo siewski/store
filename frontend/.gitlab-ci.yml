@@ -62,7 +62,7 @@ build-frontend-docker:
       --build-arg VERSION=$VERSION
       --tag $CI_REGISTRY_IMAGE/frontend:$VERSION
       .
-- docker push $CI_REGISTRY_IMAGE/frontend:$VERSION
+    - docker push $CI_REGISTRY_IMAGE/frontend:$VERSION
 
 upload-frontend-latest:
   variables:
