@@ -1,15 +1,22 @@
 ---
 apiVersion: v2
-type: application
-name: momo-store
-description: momo Helm Chart
-
-appVersion: "latest"
-
+appVersion: latest
 dependencies:
-  - name: backend
-    version: "~1.0.0"
-  - name: frontend
-    version: "~1.0.1"
+- condition: secret.enabled
+  name: secret
+  repository: ""
+  version: 0.1.0
+- condition: backend.enabled
+  name: backend
+  repository: ""
+  version: 0.1.0
+- condition: frontend.enabled
+  name: frontend
+  repository: ""
+  version: 0.1.0
+description: Momo Store Helm Chart
+home: https://gitlab.praktikum-services.ru/a.mosievskih/momo-store.git
+name: momo-store
+type: application
+version: 0.1.7
 
-version: 1.0.6
