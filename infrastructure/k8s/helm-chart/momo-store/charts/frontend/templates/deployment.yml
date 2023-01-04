@@ -24,12 +24,8 @@ spec:
           image: {{ .Values.global.frontend_reg }}
           imagePullPolicy: Always
           ports:
-            - name: frontend
+            - name: {{ .Chart.Name }}
               containerPort: 80
-          volumeMounts:
-          - name: nginx-config
-            mountPath: /etc/nginx/conf.d/default.conf
-            subPath: default.conf
           livenessProbe:
             httpGet:
               path: /
@@ -45,9 +41,5 @@ spec:
             limits:
               memory: "400Mi"
               cpu: "400m"
-      volumes:
-      - name: nginx-config
-        configMap:
-          name: momo-conf
       imagePullSecrets:
         - name: docker-config-secret
