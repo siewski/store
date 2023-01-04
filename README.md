@@ -30,6 +30,9 @@
 * Запускается пайплан, пайплан поделен на 3 даун стрима, backend, frontend и helm-chart
 * В backend и frontend еще 4 стейджа тестирование, сборка кода, сборка контейнера, релиз
 * В helm-chart 2 стейджа сборка и деплой - деблой запускается в ручную и чарт разварачивается на кластере, версии чартов прописываются вручную и хранятся в нексусе https://nexus.praktikum-services.ru/repository/momo-store-helm-a-mosievskih-07/ 
+* Так же в нексусе хранятся артефакты сборок приложения https://nexus.praktikum-services.ru/repository/momo-store-mosievskikh-frontend/ 
+https://nexus.praktikum-services.ru/repository/momo-store-mosievskikh-backend/
+
 <img width="900" alt="image" src="https://storage.yandexcloud.net/momo-store-data/monitoring/pipeline.JPG">
 
 # Развёртывание мониторинга
