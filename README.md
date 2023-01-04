@@ -8,7 +8,7 @@
 
 * Расположение пельменной https://siewski.ru/
 * Мониторниг https://grafana.siewski.ru/ 
-* admin: prom-operator!2#
+* admin: promperator!2#
 
 <img width="450" alt="image" src="https://storage.yandexcloud.net/momo-store-data/monitoring/prom.JPG">
 <img width="450" alt="image" src="https://storage.yandexcloud.net/momo-store-data/monitoring/lokilogs.JPG">
@@ -20,11 +20,43 @@
 * https://grafana.siewski.ru/d/nLJXik2Vz/new-dashboard?orgId=1
 
 # Инфраструктура
-### Terraform
-### Kubernetes
-### Развёртывание инфраструктуры
-# Развёртывание приложения
 
+### Terraform
+Инф-ра развернута с помощью terraform. Файл main.tf сохранен в infrastructure/terraform.
+Также файл состояния хранится в S3 
+### Kubernetes
+Необходимые для полноценной работы приложения файлы, лежат также в infrastructure/k8s/.
+Для деплоя приложения  используется helm chart infrastructure/k8s/helm-chart/momo-store.
+Манифест графаны расположен в infrastructure/k8s/helm-chart/manifest
+Необходимые манифесты (cert-manager, sa) развернуты по иструкции yandexcloud
+### Развёртывание инфраструктуры
+1. Вручную создается и настаривается терраформ бакеты, пользователь и бакет для статики. Для того чтобы терраформ не удалил свой собственный стейтфайл.
+2. Заполнить файл config.s3.tfbackend содержимым ключей пользователя
+```bash 
+access_key = "xxx"
+secret_key = "xxx"
+```
+3. Инициализировать хранилище
+```bash 
+cd ~/cloud-terraform
+terraform init
+```
+4. Применить изменения
+```bash 
+terraform apply
+```
+5. Установить cert-manager.
+https://cloud.yandex.ru/docs/managed-kubernetes/tutorials/ingress-cert-manager
+
+6. Прописать А-запись своему домену ip балансировщика. Посмотреть ip
+```bash 
+kubectl get svc
+```
+7. Если нужно удалить инфраструктуру 
+```bash 
+terraform destroy
+```
+# Развёртывание приложения
 Приложение равернуто в кубернетес кластере на одной ноде. 
 Порядок развёртывания приложения:
 * Запускается пайплан, пайплан поделен на 3 даун стрима, backend, frontend и helm-chart
