@@ -1,16 +1,19 @@
 <template>
-  <li 
-    class="list-group-item d-flex justify-content-between align-items-center"
-    @mouseenter="hovering = true"
-    @mouseleave="hovering = false"
-  >
-    <span>{{ cartItem.product.name }}</span>
-    <div class="right-section">
-      <button v-if="hovering" @click="removeFromCart" class="btn btn-close"></button>
-      <span v-if="!hovering" class="bg-primary quantity">{{ cartItem.quantity }}</span>
-    </div>
-  </li>
+  <ul>
+    <li 
+      class="list-group-item d-flex justify-content-between align-items-center"
+      @mouseenter="hovering = true"
+      @mouseleave="hovering = false"
+    >
+      <span>{{ cartItem.product.name }}</span>
+      <div class="right-section">
+        <button v-if="hovering" @click="removeFromCart" class="btn btn-close"></button>
+        <span v-if="!hovering" class="bg-primary quantity">{{ cartItem.quantity }}</span>
+      </div>
+    </li>
+  </ul>
 </template>
+
 
 <script lang="ts">
 import { defineComponent } from 'vue'
