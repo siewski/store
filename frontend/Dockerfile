@@ -1,12 +1,4 @@
-# build
-FROM node:14.17.3 as builder
-# Create app directory
-WORKDIR /usr/src/app
-COPY . .
-RUN npm install
-RUN npm run build
-
-# release
-FROM nginx:1.21.6-alpine
-COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
+FROM nginx:latest
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./public_html/ /usr/share/nginx/html/
 EXPOSE 80
