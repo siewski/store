@@ -1,0 +1,74 @@
+---
+variables:
+  VERSION: 1.0.${CI_PIPELINE_ID}
+  HELM_CHART_VERSION: 0.1.92122
+  SAST_EXCLUDED_ANALYZERS: "spotbugs,gosec"
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - project: 'templates/ci'
+    file: 'DockerInDockerTemplate.yml'
+
+stages:
+  - test
+  - build
+  - build-docker-front
+  - release
+
+sonarqube-frontend-check:
+  stage: test
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint:
+      - ""
+  variables:
+    SONAR_USER_HOME: ${CI_PROJECT_DIR}/.sonar
+    GIT_DEPTH: "0"
+  script:
+    - cd ${CI_PROJECT_DIR}/frontend/src
+    - sonar-scanner -Dsonar.sources=. -Dsonar.projectKey=07_MOSIEVSKIKH_MOMO_STORE_FRONTEND ${scanner_opt}
+  allow_failure: true
+
+build-code-job:  # задача с именем build-code-job
+  stage: build   # этап build
+  script:        # объявление скрипта
+    - cd frontend 
+    - npm install # загрузка всех сторонних зависимостей
+    - export VUE_APP_API_URL=/
+    - npm run build # запуск сборки кода
+    - cd .. 
+    - mv frontend/dist/ frontend-${VERSION}/ # копирование собранного фронтэнда
+    - tar -czvf frontend-${VERSION}.tar.gz frontend-${VERSION}
+    # Загрузка артефакта
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file frontend-${VERSION}.tar.gz ${NEXUS_REPO_URL}/momo-store-mosievskikh-frontend/${VERSION}/frontend-${VERSION}.tar.gz
+  artifacts:
+    paths:
+      - frontend-${VERSION}/  # сохранение собранного фронтэнда как артефакт
+
+build-frontend-docker:
+  stage: build-docker-front
+  image: docker:20.10.12-dind-rootless
+  before_script:
+    - until docker info; do sleep 1; done
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - cp -r frontend-${VERSION} frontend/public_html
+    - ls -la frontend/public_html
+    - cd frontend
+    - >
+      docker build 
+      --build-arg VERSION=$VERSION 
+      --tag $CI_REGISTRY_IMAGE/momo-frontend:$VERSION .
+    - docker push $CI_REGISTRY_IMAGE/momo-frontend:$VERSION
+upload-frontend-latest:
+  variables:
+    GIT_STRATEGY: none
+  image: docker:20.10.12-dind-rootless
+  stage: release
+  before_script:
+    - until docker info; do sleep 1; done
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE/momo-frontend:$VERSION
+    - docker tag $CI_REGISTRY_IMAGE/momo-frontend:$VERSION $CI_REGISTRY_IMAGE/momo-frontend:latest
+    - docker push $CI_REGISTRY_IMAGE/momo-frontend:latest

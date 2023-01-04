@@ -1,0 +1,8 @@
+global:
+  dockerconfigjson: "ewoJImF1dGhzIjogewoJCSJnaXRsYWIucHJha3Rpa3VtLXNlcnZpY2VzLnJ1OjUwNTAiOiB7CgkJCSJhdXRoIjogIloybDBiR0ZpSzJSbGNHeHZlUzEwYjJ0bGJpMDVNRHBJT1hOSWFVTmFXblpNVmtwSVNFdHBXRXhxYnc9PSIKCQl9Cgl9Cn0="
+  backend_reg: gitlab.praktikum-services.ru:5050/a.mosievskih/momo-store/momo-backend:latest
+  frontend_reg: gitlab.praktikum-services.ru:5050/a.mosievskih/momo-store/momo-frontend:latest 
+  fqdn: "siewski.ru"
+
+
+

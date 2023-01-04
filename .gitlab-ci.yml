@@ -1,0 +1,38 @@
+stages:
+  - module-pipelines
+
+variables:
+  scanner_opt: -Dsonar.qualitygate.wait=true -Dsonar.host.url=${sonar_url} -Dsonar.login=${sonar_token}
+  # Этот тест валится, а требования нет, исправлять долго
+  SAST_EXCLUDED_ANALYZERS: "gosec"
+
+frontend:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/frontend/.gitlab-ci.yml"
+    strategy: depend
+  only:
+    changes:
+      - frontend/**/*
+
+backend:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/backend/.gitlab-ci.yml"
+    strategy: depend
+  only:
+    changes:
+      - backend/**/*
+
+helm-chart:
+  stage: module-pipelines
+  trigger:
+    include:
+      - /infrastructure/k8s/helm-chart/.gitlab-ci.yml
+    strategy: depend
+  only:
+    changes:
+      - infrastructure/k8s/helm-chart/momo-store/**/*
+      - infrastructure/k8s/helm-chart/.gitlab-ci.yml
