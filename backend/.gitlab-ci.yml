@@ -36,7 +36,7 @@ build-code-job:
     - chmod +x api
     - mv api ../api-${VERSION}
     # Загрузка артефакта
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file ../api-${VERSION} ${NEXUS_REPO_URL}/momo-store-mosievskikh-backend/${VERSION}/api-${VERSION}
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file ../api-${VERSION} ${NEXUS_REPO_URL}/momo-store-mosievskih-backend/${VERSION}/api-${VERSION}
   artifacts:
     paths:
       - api-${VERSION}
