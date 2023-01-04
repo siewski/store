@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    acme.cert-manager.io/http01-edit-in-place: "true"
+spec:
+  tls:
+    - hosts:
+      - grafana.siewski.ru
+      secretName: letsencrypt-grafana
+  rules:
+    - host: "grafana.siewski.ru"
+      http:
+        # Для различных путей в URL можно указать различные бэкенд-сервисы
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                # Заранее создан сервис типа ClusterIP
+                # Он выступает в качестве бэкенда нашего Ingress
+                name: grafana
+                port:
+                  # У сервиса может быть несколько портов, указываем нужный нам
+                  number: 80
