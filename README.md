@@ -1,4 +1,4 @@
-# Momo Store aka Пельменная №2
+#Store
 
 <img width="900" alt="image" src="https://storage.yandexcloud.net/momo-store-data/monitoring/momo-store.JPG">
 
