@@ -8,7 +8,6 @@
 
 * Расположение пельменной https://siewski.ru/
 * Мониторниг https://grafana.siewski.ru/ 
-* admin: promperator!2#
 
 <img width="450" alt="image" src="https://storage.yandexcloud.net/momo-store-data/monitoring/prom.JPG">
 <img width="450" alt="image" src="https://storage.yandexcloud.net/momo-store-data/monitoring/lokilogs.JPG">
